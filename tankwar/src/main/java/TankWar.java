@@ -10,47 +10,28 @@ class TankWar extends JComponent {
 
     private static final int REPAINT_INTERVAL = 50;
 
-    private int x = WIDTH / 2, y = HEIGHT / 2;
+    private int x = WIDTH / 2, y = HEIGHT / 2; //initialized location of playerTank
     private int my = HEIGHT / 2 + 50;
 
-    private TankWar() {
-        this.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                int key = e.getKeyCode();
-                if (key == KeyEvent.VK_CONTROL) {
-                    Tools.playAudio("shoot.wav");
-                    my += 10;
-                } else if (key == KeyEvent.VK_A) {
-                    Tools.playAudio(Tools.nextBoolean() ? "supershoot.wav" : "supershoot.aiff");
-                    my += 10;
-                } else if (key == KeyEvent.VK_LEFT) {
-                    x -= 5;
-                } else if (key == KeyEvent.VK_UP) {
-                    y -= 5;
-                } else if (key == KeyEvent.VK_RIGHT) {
-                    x += 5;
-                } else if (key == KeyEvent.VK_DOWN) {
-                    y += 5;
-                }
+    private PlayerTank playerTank;
+    private Blood blood;
 
-                if (my >= HEIGHT) {
-                    my = Tools.nextInt(HEIGHT);
-                }
-            }
-        });
+    private TankWar() {
+        playerTank = new PlayerTank(new Location(x,y));
+        this.addKeyListener(this.playerTank);
     }
 
     @Override
     protected void paintComponent(Graphics g) {
+        //draw background
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, WIDTH, HEIGHT);
-
+        //draw wall
         g.setColor(Color.DARK_GRAY);
         g.fillRect(250, 100, 300, 20);
         g.fillRect(100, 200, 20, 150);
         g.fillRect(680, 200, 20, 150);
-
+        //draw blood
         g.setColor(Color.MAGENTA);
         g.fillRect(360, 270, 15, 15);
 
@@ -61,20 +42,23 @@ class TankWar extends JComponent {
         g.drawString("Our Tank HP: " + Tools.nextInt(10), 10, 90);
         g.drawString("Enemies Left: " + Tools.nextInt(10), 10, 110);
         g.drawString("Enemies Killed: " + Tools.nextInt(10), 10, 130);
-
-        g.setColor(Color.RED);
-        g.fillRect(x, y - 10, 35, 10);
-        g.drawImage(new ImageIcon(this.getClass().getResource("images/tankD.gif")).getImage(),
-            x, y, null);
-
+        //draw HP
+//        g.setColor(Color.RED);
+//        g.fillRect(x, y - 10, 35, 10);
+        //g.drawImage(new ImageIcon(this.getClass().getResource("images/tankD.gif")).getImage(),
+         //   x, y, null);
+        //blood.draw(g);
+        playerTank.draw(g);
+        //draw enemy tanks
         int dist = (WIDTH - 120) / 9;
         for (int i = 0; i < 10; i++) {
             g.drawImage(new ImageIcon(this.getClass().getResource("images/tankU.gif")).getImage(),
                 50 + dist * i, HEIGHT / 2 + 100, null);
         }
+        //draw missile
         g.drawImage(new ImageIcon(this.getClass().getResource("images/missileD.gif")).getImage(),
             WIDTH / 2, my, null);
-
+        //draw explosion
         g.drawImage(new ImageIcon(this.getClass().getResource("images/10.gif")).getImage(),
             WIDTH / 2, 100, null);
     }
