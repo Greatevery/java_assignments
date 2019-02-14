@@ -70,11 +70,14 @@ public class PlayerTank extends Tank implements KeyListener {
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         switch (key){
+            case KeyEvent.VK_SPACE:
+                TankWar.getInstance().start();
+                return;
             case KeyEvent.VK_F2:
                 if(!this.isAlive()){
                     TankWar.getInstance().restart();
                 }
-                break;
+                return;
             case KeyEvent.VK_CONTROL :
                 this.totalMissiles--;
                 this.fire();

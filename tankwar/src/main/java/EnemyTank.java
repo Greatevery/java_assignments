@@ -12,11 +12,10 @@ public class EnemyTank extends Tank{
         this.hp = FULL_HP;
         this.speedX = 5;
         this.speedY = 5;
+        this.direction = Direction.Up;
         this.randStep = Tools.nextInt(5);
         this.moveEpoch = MOVE_EPOCH;
         this.fireEpoch = FIRE_EPOCH;
-
-        setRandomDirection();
     }
 
 

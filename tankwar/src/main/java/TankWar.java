@@ -13,6 +13,7 @@ class TankWar extends JComponent {
 
     private static final int REPAINT_INTERVAL = 50;
 
+    private boolean gameStart;
     private int x = WIDTH / 2, y = HEIGHT / 2; //initialized location of playerTank
     private int my = HEIGHT / 2 + 50;
 
@@ -24,6 +25,10 @@ class TankWar extends JComponent {
     private List<Wall> walls;
 
     private TankWar() {
+        gameStart = false;
+    }
+
+    private void initWorld(){
         playerTank = new PlayerTank(new Location(x,y));
         enemyTanks = new ArrayList<>();
         missiles = new ArrayList<>();
@@ -42,22 +47,6 @@ class TankWar extends JComponent {
         walls.add(new Wall(new Location(680, 200), 20, 150));
     }
 
-    private void initWorld(){
-        PlatformImpl.startup(() -> {});
-        Tools.setTheme();
-        JFrame frame = new JFrame("Tank War");
-        frame.setIconImage(new ImageIcon(TankWar.class.getResource("/icon.png")).getImage());
-        frame.setSize(WIDTH, HEIGHT);
-        frame.setLocation(400, 100);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setResizable(false);
-
-        frame.add(this);
-        // KeyListeners need to be on the focused component to work
-        this.setFocusable(true);
-        frame.setVisible(true);
-    }
-
     private static TankWar INSTANCE;
 
     public static TankWar getInstance(){
@@ -68,9 +57,8 @@ class TankWar extends JComponent {
     }
 
     public void restart(){
-        TankWar tankWar = TankWar.getInstance();
-        tankWar.initWorld();
-        tankWar.start();
+        this.initWorld();
+        this.gameStart = false;
     }
 
     public void gameOver(Graphics g){
@@ -190,37 +178,47 @@ class TankWar extends JComponent {
 
     @Override
     protected void paintComponent(Graphics g) {
+
         //draw background
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, WIDTH, HEIGHT);
-        //draw game data
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("Default", Font.BOLD, 14));
-        g.drawString("Missiles: " + playerTank.getTotalMissiles(), 10, 50);
-        g.drawString("Explodes: " + explodes.size(), 10, 70);
-        g.drawString("Our Tank HP: " + playerTank.getHp(), 10, 90);
-        g.drawString("Enemies Left: " + enemyTanks.size(), 10, 110);
-        g.drawString("Enemies Killed: " + (12 - enemyTanks.size()), 10, 130);
-        //draw game objects
-        for(Wall wall : walls)
-            wall.draw(g);
-        blood.draw(g);
-        if(playerTank.isAlive()){
-            playerTank.draw(g);
-            for(Missile missile : missiles){
-                missile.draw(g);
-            }
-            for(EnemyTank enemyTank : enemyTanks)
-                enemyTank.draw(g);
-            for(Explode explode : explodes)
-                explode.draw(g);
+        //start interface
+        if(!this.gameStart){
+            g.setColor(Color.RED);
+            g.setFont(new Font("Default", Font.BOLD, 30));
+            g.drawString("PRESS SPACE TO START GAME", x - 250, y - 100);
+            this.gameStart = true;
         }else{
-            gameOver(g);
+            //draw game data
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Default", Font.BOLD, 14));
+            g.drawString("Missiles: " + playerTank.getTotalMissiles(), 10, 50);
+            g.drawString("Explodes: " + explodes.size(), 10, 70);
+            g.drawString("Our Tank HP: " + playerTank.getHp(), 10, 90);
+            g.drawString("Enemies Left: " + enemyTanks.size(), 10, 110);
+            g.drawString("Enemies Killed: " + (12 - enemyTanks.size()), 10, 130);
+            //draw game objects
+            for(Wall wall : walls)
+                wall.draw(g);
+            blood.draw(g);
+            if(playerTank.isAlive()){
+                playerTank.draw(g);
+                for(Missile missile : missiles){
+                    missile.draw(g);
+                }
+                for(EnemyTank enemyTank : enemyTanks)
+                    enemyTank.draw(g);
+                for(Explode explode : explodes)
+                    explode.draw(g);
+            }else{
+                gameOver(g);
+            }
         }
+
 
     }
 
-    private void start() {
+    public void start() {
         new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() {
@@ -241,6 +239,18 @@ class TankWar extends JComponent {
 
         TankWar tankWar = TankWar.getInstance();
         tankWar.initWorld();
-        tankWar.start();
+        PlatformImpl.startup(() -> {});
+        Tools.setTheme();
+        JFrame frame = new JFrame("Tank War");
+        frame.setIconImage(new ImageIcon(TankWar.class.getResource("/icon.png")).getImage());
+        frame.setSize(WIDTH, HEIGHT);
+        frame.setLocation(400, 100);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setResizable(false);
+
+        frame.add(tankWar);
+        // KeyListeners need to be on the focused component to work
+        tankWar.setFocusable(true);
+        frame.setVisible(true);
     }
 }
