@@ -11,7 +11,7 @@ public class Tank extends GameObject {
 
     private boolean isAlive;
 
-    protected Blood blood;
+    protected int hp;
     protected int speedX;
     protected int speedY;
     protected Direction direction;
@@ -25,17 +25,18 @@ public class Tank extends GameObject {
         return isAlive;
     }
 
-    public Blood getBlood(){
-        return this.blood;
+    public int getHp() {
+        return hp;
     }
 
-    public void setBlood(Blood blood) {
-        this.blood = blood;
-        if(this.blood.getHP() <= 0){
+    public void setHp(int hp) {
+        this.hp = hp;
+        if(this.hp <= 0){
             this.isAlive = false;
-            this.blood.setHP(0);
+            this.hp = 0;
         }
     }
+
 
 
     public boolean outOfBounds(){
@@ -68,7 +69,7 @@ public class Tank extends GameObject {
         //draw HP
         if(this.getClass().getName() == "PlayerTank"){
             g.setColor(Color.RED);
-            g.fillRect(this.location.getX(), this.location.getY() - 10, 35 * this.blood.getHP() / PlayerTank.FULL_HP, 10);
+            g.fillRect(this.location.getX(), this.location.getY() - 10, 35 * this.hp / PlayerTank.FULL_HP, 10);
         }
 
     }

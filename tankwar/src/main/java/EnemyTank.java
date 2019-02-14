@@ -1,4 +1,5 @@
 public class EnemyTank extends Tank{
+    public final static int FULL_HP = 20;
     final static int MOVE_EPOCH = 3;
     final static int FIRE_EPOCH = 5;
 
@@ -8,37 +9,36 @@ public class EnemyTank extends Tank{
 
     public EnemyTank(Location location){
         super(location);
-        this.blood = new Blood(20);
+        this.hp = FULL_HP;
         this.speedX = 5;
         this.speedY = 5;
-        this.direction = getRandomDirection();
         this.randStep = Tools.nextInt(5);
         this.moveEpoch = MOVE_EPOCH;
         this.fireEpoch = FIRE_EPOCH;
+
+        setRandomDirection();
     }
 
 
-    public Direction getRandomDirection(){
-        Direction newDir = this.direction;
+    public void setRandomDirection(){
         int rand = Tools.nextInt(8);
         for(Direction dir : Direction.values()){
             if(dir.getIndex() == rand)
-                newDir = dir;
+                this.direction = dir;
         }
-        return newDir;
     }
 
     public void randomMove(){
         if(this.moveEpoch <= 0){
             if(this.randStep <= 0){
-                this.direction = getRandomDirection();
+                setRandomDirection();
                 this.randStep = Tools.nextInt(8);
             }
             if(!this.outOfBounds()){
                 this.move();
                 this.randStep--;
             }else {
-                this.direction = getRandomDirection();
+                setRandomDirection();
                 this.randStep = Tools.nextInt(8);
             }
             this.moveEpoch = MOVE_EPOCH;

@@ -10,7 +10,7 @@ public class PlayerTank extends Tank implements KeyListener {
 
     public PlayerTank(Location location){
         super(location);
-        this.blood = new Blood(FULL_HP);
+        this.hp = FULL_HP;
         this.speedX = 5;
         this.speedY = 5;
         this.direction = Direction.Down;
@@ -70,6 +70,11 @@ public class PlayerTank extends Tank implements KeyListener {
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         switch (key){
+            case KeyEvent.VK_F2:
+                if(!this.isAlive()){
+                    TankWar.getInstance().restart();
+                }
+                break;
             case KeyEvent.VK_CONTROL :
                 this.totalMissiles--;
                 this.fire();
