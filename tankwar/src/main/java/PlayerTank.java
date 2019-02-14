@@ -1,15 +1,69 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
+import java.util.ListIterator;
 
 public class PlayerTank extends Tank implements KeyListener {
+    public final static int FULL_HP = 100;
+    private int totalMissiles;
+
     public PlayerTank(Location location){
         super(location);
-        this.blood = new Blood(5);
+        this.blood = new Blood(FULL_HP);
         this.speedX = 5;
         this.speedY = 5;
         this.direction = Direction.Down;
-        this.imageIcon = new ImageIcon(this.getClass().getResource("images/tankD.gif"));
+        this.totalMissiles = 50;
+    }
+
+    public int getTotalMissiles() {
+        return totalMissiles;
+    }
+
+    public void setTotalMissiles(int totalMissiles) {
+        this.totalMissiles = totalMissiles;
+    }
+
+    public void updateLocation(){
+        //update the location of tank
+        Direction newDir = updateDirection();
+        if(this.direction == newDir) {
+            if(!this.outOfBounds())
+                this.move();
+        }else{
+            this.direction = newDir;
+        }
+    }
+
+    private boolean bu, bd, bl, br;
+
+    public Direction updateDirection(){
+        Direction newDir = this.direction;
+        if(bu && !bd && !bl && !br)
+            newDir = Direction.Up;
+        else if(!bu && bd && !bl && !br)
+            newDir = Direction.Down;
+        else if(!bu && !bd && bl && !br)
+            newDir = Direction.Left;
+        else if(!bu && !bd && !bl && br)
+            newDir = Direction.Right;
+        else if(bu && !bd && bl && !br)
+            newDir = Direction.LeftUp;
+        else if(bu && !bd && !bl && br)
+            newDir = Direction.RightUp;
+        else if(!bu && bd && bl && !br)
+            newDir = Direction.LeftDown;
+        else if(!bu && bd && !bl && br)
+            newDir = Direction.RightDown;
+         return newDir;
+    }
+
+
+    public void superFire(){
+        Tools.playAudio(Tools.nextBoolean() ? "supershoot.wav" : "supershoot.aiff");
+        for(Direction direction : Direction.values())
+            TankWar.getInstance().addMissile(new Missile(this, direction));
     }
 
     @Override
@@ -17,39 +71,29 @@ public class PlayerTank extends Tank implements KeyListener {
         int key = e.getKeyCode();
         switch (key){
             case KeyEvent.VK_CONTROL :
-                break;
+                this.totalMissiles--;
+                this.fire();
+                return;
             case KeyEvent.VK_A :
-                break;
+                this.totalMissiles -= 8;
+                this.superFire();
+                return;
             case KeyEvent.VK_LEFT :
-                this.location.setX(this.location.getX() - this.speedX);
+                bl = true;
                 break;
             case KeyEvent.VK_UP :
-                this.location.setY(this.location.getY() - this.speedY);
+                bu = true;
                 break;
             case KeyEvent.VK_RIGHT :
-                this.location.setX(this.location.getX() + this.speedX);
+                br = true;
                 break;
             case KeyEvent.VK_DOWN :
-                this.location.setY(this.location.getY() + this.speedY);
+                bd = true;
                 break;
             default : break;
         }
-//        if (key == KeyEvent.VK_CONTROL) {
-//            Tools.playAudio("shoot.wav");
-//            my += 10;
-//        } else if (key == KeyEvent.VK_A) {
-//            Tools.playAudio(Tools.nextBoolean() ? "supershoot.wav" : "supershoot.aiff");
-//            my += 10;
-//        } else if (key == KeyEvent.VK_LEFT) {
-//            x -= 5;
-//        } else if (key == KeyEvent.VK_UP) {
-//            y -= 5;
-//        } else if (key == KeyEvent.VK_RIGHT) {
-//            x += 5;
-//        } else if (key == KeyEvent.VK_DOWN) {
-//            y += 5;
-//        }
-//
+        updateLocation();
+
 //        if (my >= HEIGHT) {
 //            my = Tools.nextInt(HEIGHT);
 //        }
@@ -57,19 +101,32 @@ public class PlayerTank extends Tank implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-
+        int key = e.getKeyCode();
+        switch (key){
+            case KeyEvent.VK_CONTROL :
+                break;
+            case KeyEvent.VK_A :
+                break;
+            case KeyEvent.VK_LEFT :
+                bl = false;
+                break;
+            case KeyEvent.VK_UP :
+                bu = false;
+                break;
+            case KeyEvent.VK_RIGHT :
+                br = false;
+                break;
+            case KeyEvent.VK_DOWN :
+                bd = false;
+                break;
+            default : break;
+        }
     }
+
 
     @Override
     public void keyTyped(KeyEvent e) {
 
     }
 
-    @Override
-    public void draw(Graphics g) {
-        g.drawImage(imageIcon.getImage(), this.location.getX(), this.location.getY(), null);
-        //draw HP
-        g.setColor(Color.RED);
-        g.fillRect(this.location.getX(), this.location.getY() - 10, 35, 10);
-    }
 }

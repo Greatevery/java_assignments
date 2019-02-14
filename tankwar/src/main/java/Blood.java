@@ -16,6 +16,11 @@ public class Blood extends GameObject {
     }
 
     @Override
+    public Rectangle getRectangle() {
+        return null;
+    }
+
+    @Override
     public void draw(Graphics g) {
 
     }
