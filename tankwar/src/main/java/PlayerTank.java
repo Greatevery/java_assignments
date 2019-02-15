@@ -5,8 +5,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 public class PlayerTank extends Tank implements KeyListener {
-    public final static int FULL_HP = 100;
-    private int totalMissiles;
+    public final static int FULL_HP = 1000;
 
     public PlayerTank(Location location){
         super(location);
@@ -14,16 +13,8 @@ public class PlayerTank extends Tank implements KeyListener {
         this.speedX = 5;
         this.speedY = 5;
         this.direction = Direction.Down;
-        this.totalMissiles = 50;
     }
 
-    public int getTotalMissiles() {
-        return totalMissiles;
-    }
-
-    public void setTotalMissiles(int totalMissiles) {
-        this.totalMissiles = totalMissiles;
-    }
 
     public void updateLocation(){
         //update the location of tank
@@ -71,7 +62,10 @@ public class PlayerTank extends Tank implements KeyListener {
         int key = e.getKeyCode();
         switch (key){
             case KeyEvent.VK_SPACE:
-                TankWar.getInstance().start();
+                if(!TankWar.getInstance().isGameStart()){
+                    TankWar.getInstance().setGameStart(true);
+                    TankWar.getInstance().start();
+                }
                 return;
             case KeyEvent.VK_F2:
                 if(!this.isAlive()){
@@ -79,11 +73,9 @@ public class PlayerTank extends Tank implements KeyListener {
                 }
                 return;
             case KeyEvent.VK_CONTROL :
-                this.totalMissiles--;
                 this.fire();
                 return;
             case KeyEvent.VK_A :
-                this.totalMissiles -= 8;
                 this.superFire();
                 return;
             case KeyEvent.VK_LEFT :

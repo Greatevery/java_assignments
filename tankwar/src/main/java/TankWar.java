@@ -58,7 +58,15 @@ class TankWar extends JComponent {
 
     public void restart(){
         this.initWorld();
-        this.gameStart = false;
+        //this.gameStart = false;
+    }
+
+    public boolean isGameStart() {
+        return gameStart;
+    }
+
+    public void setGameStart(boolean gameStart) {
+        this.gameStart = gameStart;
     }
 
     public void gameOver(Graphics g){
@@ -74,7 +82,7 @@ class TankWar extends JComponent {
     }
 
     public void triggerEvent(){
-        if(playerTank.isAlive()){
+        if(playerTank.isAlive() && this.gameStart){
             playerTankEatBlood();
             playerTankIsDying();
             missileOutOfBounds();
@@ -187,32 +195,30 @@ class TankWar extends JComponent {
             g.setColor(Color.RED);
             g.setFont(new Font("Default", Font.BOLD, 30));
             g.drawString("PRESS SPACE TO START GAME", x - 250, y - 100);
-            this.gameStart = true;
+        }
+        //draw game data
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Default", Font.BOLD, 14));
+        g.drawString("Missiles: " + missiles.size(), 10, 50);
+        g.drawString("Explodes: " + explodes.size(), 10, 70);
+        g.drawString("Our Tank HP: " + playerTank.getHp(), 10, 90);
+        g.drawString("Enemies Left: " + enemyTanks.size(), 10, 110);
+        g.drawString("Enemies Killed: " + (12 - enemyTanks.size()), 10, 130);
+        //draw game objects
+        for(Wall wall : walls)
+            wall.draw(g);
+        blood.draw(g);
+        if(playerTank.isAlive()){
+            playerTank.draw(g);
+            for(int i = 0; i < missiles.size(); ++i)
+                missiles.get(i).draw(g);
+            for(int i = 0;i < enemyTanks.size(); ++i)
+                enemyTanks.get(i).draw(g);
+            for(int i = 0;i < explodes.size(); ++i)
+                explodes.get(i).draw(g);
+
         }else{
-            //draw game data
-            g.setColor(Color.WHITE);
-            g.setFont(new Font("Default", Font.BOLD, 14));
-            g.drawString("Missiles: " + playerTank.getTotalMissiles(), 10, 50);
-            g.drawString("Explodes: " + explodes.size(), 10, 70);
-            g.drawString("Our Tank HP: " + playerTank.getHp(), 10, 90);
-            g.drawString("Enemies Left: " + enemyTanks.size(), 10, 110);
-            g.drawString("Enemies Killed: " + (12 - enemyTanks.size()), 10, 130);
-            //draw game objects
-            for(Wall wall : walls)
-                wall.draw(g);
-            blood.draw(g);
-            if(playerTank.isAlive()){
-                playerTank.draw(g);
-                for(Missile missile : missiles){
-                    missile.draw(g);
-                }
-                for(EnemyTank enemyTank : enemyTanks)
-                    enemyTank.draw(g);
-                for(Explode explode : explodes)
-                    explode.draw(g);
-            }else{
-                gameOver(g);
-            }
+            gameOver(g);
         }
 
 
