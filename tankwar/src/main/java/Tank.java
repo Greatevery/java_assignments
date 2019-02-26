@@ -67,7 +67,7 @@ public class Tank extends GameObject {
     public void draw(Graphics g) {
         g.drawImage(this.direction.getImage("Tank"), this.location.getX(), this.location.getY(), null);
         //draw HP
-        if(this.getClass().getName() == "PlayerTank"){
+        if("PlayerTank".equals(this.getClass().getName())){
             g.setColor(Color.RED);
             g.fillRect(this.location.getX(), this.location.getY() - 10, 35 * this.hp / PlayerTank.FULL_HP, 10);
         }

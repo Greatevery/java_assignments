@@ -16,7 +16,7 @@ public class PlayerTank extends Tank implements KeyListener {
     }
 
 
-    public void updateLocation(){
+    private void updateLocation(){
         //update the location of tank
         Direction newDir = updateDirection();
         if(this.direction == newDir) {
@@ -29,7 +29,7 @@ public class PlayerTank extends Tank implements KeyListener {
 
     private boolean bu, bd, bl, br;
 
-    public Direction updateDirection(){
+    private Direction updateDirection(){
         Direction newDir = this.direction;
         if(bu && !bd && !bl && !br)
             newDir = Direction.Up;
@@ -93,10 +93,6 @@ public class PlayerTank extends Tank implements KeyListener {
             default : break;
         }
         updateLocation();
-
-//        if (my >= HEIGHT) {
-//            my = Tools.nextInt(HEIGHT);
-//        }
     }
 
     @Override

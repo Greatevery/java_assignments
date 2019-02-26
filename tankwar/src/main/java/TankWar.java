@@ -69,19 +69,12 @@ class TankWar extends JComponent {
         this.gameStart = gameStart;
     }
 
-    public void gameOver(Graphics g){
-        Tools.playAudio("death.mp3");
-        g.setColor(Color.RED);
-        g.setFont(new Font("Default", Font.BOLD, 30));
-        g.drawString("GAME OVER ", x - 100, y - 100);
-        g.drawString("PRESS F2 TO RESTART", x - 160, y - 60);
-    }
 
     public void addMissile(Missile missile){
         missiles.add(missile);
     }
 
-    public void triggerEvent(){
+    private void triggerEvent(){
         if(playerTank.isAlive() && this.gameStart){
             playerTankEatBlood();
             playerTankIsDying();
@@ -95,14 +88,14 @@ class TankWar extends JComponent {
         }
     }
 
-    public void playerTankEatBlood(){
+    private void playerTankEatBlood(){
         if(playerTank.getRectangle().intersects(blood.getRectangle())){
             playerTank.setHp(PlayerTank.FULL_HP);
             blood.setAppear(false);
         }
     }
 
-    public void enemyTankHitWalls(){
+    private void enemyTankHitWalls(){
         for(Wall wall : walls){
             for(EnemyTank enemyTank : enemyTanks){
                 if(wall.getRectangle().intersects(enemyTank.getRectangle())){
@@ -112,7 +105,7 @@ class TankWar extends JComponent {
         }
     }
 
-    public void playerTankIsDying(){
+    private void playerTankIsDying(){
         if(playerTank.getHp() < PlayerTank.FULL_HP / 2){
             int rand = Tools.nextInt(3);
             if(rand == 0 || rand == 1)
@@ -121,26 +114,27 @@ class TankWar extends JComponent {
     }
 
 
-    public void enemyTankRandomMoveAndFire(){
+    private void enemyTankRandomMoveAndFire(){
         for(EnemyTank enemyTank : enemyTanks){
             enemyTank.randomMove();
             enemyTank.randomFire();
         }
     }
 
-    public void missileHitWalls(){
+    private void missileHitWalls(){
         for(Wall wall : walls){
             missiles.removeIf(missile -> missile.getRectangle().intersects(wall.getRectangle()));
         }
     }
 
-    public void missileOutOfBounds(){
+    private void missileOutOfBounds(){
         missiles.removeIf(missile -> missile.outOfBounds());
-        for(Missile missile : missiles)
-            missile.move();
+        for (int i = 0; i < missiles.size(); i++) {
+            missiles.get(i).move();
+        }
     }
 
-    public void missileHitTank(){
+    private void missileHitTank(){
         ListIterator<Missile> iterMissile = missiles.listIterator();
         while(iterMissile.hasNext()){
             Missile missile = iterMissile.next();
@@ -165,7 +159,7 @@ class TankWar extends JComponent {
         }
     }
 
-    public void playerTankHitEnemyTank(){
+    private void playerTankHitEnemyTank(){
         //enemyTanks.removeIf(enemyTank -> enemyTank.getRectangle().intersects(playerTank.getRectangle()));
         for(EnemyTank enemyTank : enemyTanks){
             if(enemyTank.getRectangle().intersects(playerTank.getRectangle()))
@@ -173,7 +167,7 @@ class TankWar extends JComponent {
         }
     }
 
-    public void enemyTankHitEachOther(){
+    private void enemyTankHitEachOther(){
         for(int i = 0;i < enemyTanks.size(); ++i)
             for(int j = i + 1; j < enemyTanks.size(); ++j){
                 if(enemyTanks.get(i).getRectangle().intersects(enemyTanks.get(j).getRectangle())){
@@ -190,7 +184,7 @@ class TankWar extends JComponent {
         //draw background
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, WIDTH, HEIGHT);
-        //start interface
+        //start UI
         if(!this.gameStart){
             g.setColor(Color.RED);
             g.setFont(new Font("Default", Font.BOLD, 30));
@@ -208,6 +202,8 @@ class TankWar extends JComponent {
         for(Wall wall : walls)
             wall.draw(g);
         blood.draw(g);
+
+        //if player tank is alive, then draw the player tank and enemy tanks
         if(playerTank.isAlive()){
             playerTank.draw(g);
             for(int i = 0; i < missiles.size(); ++i)
@@ -218,7 +214,12 @@ class TankWar extends JComponent {
                 explodes.get(i).draw(g);
 
         }else{
-            gameOver(g);
+            //draw the UI of game over
+            Tools.playAudio("death.mp3");
+            g.setColor(Color.RED);
+            g.setFont(new Font("Default", Font.BOLD, 30));
+            g.drawString("GAME OVER ", x - 100, y - 100);
+            g.drawString("PRESS F2 TO RESTART", x - 160, y - 60);
         }
 
 
