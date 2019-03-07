@@ -1,10 +1,15 @@
-public class Location {
+public class Location implements Cloneable{
     private int x;
     private int y;
 
     public Location(int x, int y){
         this.x = x;
         this.y = y;
+    }
+
+    @Override
+    public Location clone() throws CloneNotSupportedException {
+        return (Location)super.clone();
     }
 
     public int getX() {

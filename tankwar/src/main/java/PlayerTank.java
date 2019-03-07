@@ -1,26 +1,22 @@
-import javax.swing.*;
-import java.awt.*;
+
 import java.awt.event.*;
-import java.util.List;
-import java.util.ListIterator;
 
 public class PlayerTank extends Tank implements KeyListener {
-    public final static int FULL_HP = 1000;
+    public static final int FULL_HP = 1000;
 
     public PlayerTank(Location location){
         super(location);
-        this.hp = FULL_HP;
-        this.speedX = 5;
-        this.speedY = 5;
-        this.direction = Direction.Down;
+        super.hp = FULL_HP;
+        super.speedX = 5;
+        super.speedY = 5;
+        super.direction = Direction.Down;
     }
 
-
-    private void updateLocation(){
+    private void updateLocation() throws CloneNotSupportedException {
         //update the location of tank
         Direction newDir = updateDirection();
         if(this.direction == newDir) {
-            if(!this.outOfBounds())
+            if(this.canMove())
                 this.move();
         }else{
             this.direction = newDir;
@@ -92,7 +88,11 @@ public class PlayerTank extends Tank implements KeyListener {
                 break;
             default : break;
         }
-        updateLocation();
+        try {
+            updateLocation();
+        } catch (CloneNotSupportedException e1) {
+            e1.printStackTrace();
+        }
     }
 
     @Override

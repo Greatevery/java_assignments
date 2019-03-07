@@ -74,7 +74,7 @@ class TankWar extends JComponent {
         missiles.add(missile);
     }
 
-    private void triggerEvent(){
+    private void triggerEvent() throws CloneNotSupportedException {
         if(playerTank.isAlive() && this.gameStart){
             playerTankEatBlood();
             playerTankIsDying();
@@ -82,6 +82,7 @@ class TankWar extends JComponent {
             missileHitTank();
             missileHitWalls();
             playerTankHitEnemyTank();
+            playerTankHitWalls();
             enemyTankRandomMoveAndFire();
             enemyTankHitEachOther();
             enemyTankHitWalls();
@@ -114,7 +115,7 @@ class TankWar extends JComponent {
     }
 
 
-    private void enemyTankRandomMoveAndFire(){
+    private void enemyTankRandomMoveAndFire() throws CloneNotSupportedException {
         for(EnemyTank enemyTank : enemyTanks){
             enemyTank.randomMove();
             enemyTank.randomFire();
@@ -159,15 +160,17 @@ class TankWar extends JComponent {
         }
     }
 
-    private void playerTankHitEnemyTank(){
-        //enemyTanks.removeIf(enemyTank -> enemyTank.getRectangle().intersects(playerTank.getRectangle()));
-        for(EnemyTank enemyTank : enemyTanks){
-            if(enemyTank.getRectangle().intersects(playerTank.getRectangle()))
-                enemyTank.randomMove();
+
+
+    private void playerTankHitWalls(){
+        for(Wall wall : walls){
+            if(wall.getRectangle().intersects(playerTank.getRectangle())){
+
+            }
         }
     }
 
-    private void enemyTankHitEachOther(){
+    private void enemyTankHitEachOther() throws CloneNotSupportedException {
         for(int i = 0;i < enemyTanks.size(); ++i)
             for(int j = i + 1; j < enemyTanks.size(); ++j){
                 if(enemyTanks.get(i).getRectangle().intersects(enemyTanks.get(j).getRectangle())){
@@ -175,6 +178,31 @@ class TankWar extends JComponent {
                     enemyTanks.get(j).randomMove();
                 }
             }
+    }
+
+    public boolean tankHitBounds(Tank tank){
+        int x = tank.getLocation().getX();
+        int y = tank.getLocation().getY();
+        if(x <= 0 || x > TankWar.WIDTH  - Tank.WIDTH|| y <= 0 || y > TankWar.HEIGHT - Tank.HEIGHT)
+            return true;
+        return false;
+    }
+
+    public boolean tankHitWalls(Tank tank){
+        for(Wall wall : walls){
+            if(wall.getRectangle().intersects(tank.getRectangle())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void playerTankHitEnemyTank() throws CloneNotSupportedException {
+        //enemyTanks.removeIf(enemyTank -> enemyTank.getRectangle().intersects(playerTank.getRectangle()));
+        for(EnemyTank enemyTank : enemyTanks){
+            if(enemyTank.getRectangle().intersects(playerTank.getRectangle()))
+                enemyTank.randomMove();
+        }
     }
 
 

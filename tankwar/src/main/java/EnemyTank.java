@@ -18,22 +18,21 @@ public class EnemyTank extends Tank{
         this.fireEpoch = FIRE_EPOCH;
     }
 
-
     public void setRandomDirection(){
         int rand = Tools.nextInt(8);
         for(Direction dir : Direction.values()){
-            if(dir.getIndex() == rand)
+            if(dir.ordinal() == rand)
                 this.direction = dir;
         }
     }
 
-    public void randomMove(){
+    public void randomMove() throws CloneNotSupportedException {
         if(this.moveEpoch <= 0){
             if(this.randStep <= 0){
                 setRandomDirection();
                 this.randStep = Tools.nextInt(8);
             }
-            if(!this.outOfBounds()){
+            if(this.canMove()){
                 this.move();
                 this.randStep--;
             }else {
@@ -43,7 +42,6 @@ public class EnemyTank extends Tank{
             this.moveEpoch = MOVE_EPOCH;
         }
         this.moveEpoch--;
-
     }
 
     public void randomFire(){

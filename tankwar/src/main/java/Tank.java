@@ -1,12 +1,6 @@
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.ArrayList;
-import java.util.List;
 
-public class Tank extends GameObject {
+public class Tank extends GameObject implements Cloneable{
     public static final int WIDTH = 50, HEIGHT = 60;
 
     private boolean isAlive;
@@ -20,6 +14,16 @@ public class Tank extends GameObject {
         super(location);
         isAlive = true;
     }
+
+    @Override
+    public Tank clone() throws CloneNotSupportedException {
+        Tank tank = (Tank)super.clone();
+        if(location != null){
+            tank.setLocation(location.clone());
+        }
+        return tank;
+    }
+
 
     public boolean isAlive(){
         return isAlive;
@@ -37,16 +41,21 @@ public class Tank extends GameObject {
         }
     }
 
-
-
-    public boolean outOfBounds(){
-        int x = this.location.getX() + this.speedX * direction.xDir;
-        int y = this.location.getY() + this.speedY * direction.yDir;
-        if(x <= 0 || x > TankWar.WIDTH  - Tank.WIDTH|| y <= 0 || y > TankWar.HEIGHT - Tank.HEIGHT)
+    private boolean hit(){
+        if(TankWar.getInstance().tankHitBounds(this)){
             return true;
+        }
+        if(TankWar.getInstance().tankHitWalls(this)){
+            return true;
+        }
         return false;
     }
 
+    public boolean canMove() throws CloneNotSupportedException {
+        Tank temp = this.clone();
+        temp.move();
+        return temp.hit() ? false : true;
+    }
     public void move(){
         this.location.setX(this.location.getX() + this.speedX * direction.xDir);
         this.location.setY((this.location.getY() + this.speedY * direction.yDir));
