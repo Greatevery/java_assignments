@@ -3,9 +3,23 @@ import java.awt.*;
 public abstract class GameObject{
     protected Location location;
     protected Image image;
+    protected int width;
+    protected int height;
 
     public  GameObject(){
 
+    }
+
+    public GameObject(Location location){
+        this.location = location;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 
     public Location getLocation() {
@@ -16,11 +30,9 @@ public abstract class GameObject{
         this.location = location;
     }
 
-    public GameObject(Location location){
-        this.location = location;
+    public Rectangle getRectangle(){
+        return new Rectangle(this.location.getX(), this.location.getY(), width, height);
     }
-
-    public abstract Rectangle getRectangle();
 
     public abstract void draw(Graphics g);
 }

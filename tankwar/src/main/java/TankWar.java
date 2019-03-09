@@ -2,8 +2,6 @@ import com.sun.javafx.application.PlatformImpl;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -15,7 +13,6 @@ class TankWar extends JComponent {
 
     private boolean gameStart;
     private int x = WIDTH / 2, y = HEIGHT / 2; //initialized location of playerTank
-    private int my = HEIGHT / 2 + 50;
 
     private PlayerTank playerTank;
     private List<EnemyTank> enemyTanks;
@@ -42,9 +39,9 @@ class TankWar extends JComponent {
             enemyTanks.add(new EnemyTank(new Location(50 + dist * i,HEIGHT / 2 + 100)));
         }
         //initialize walls
-        walls.add(new Wall(new Location(250, 100), 300, 20));
-        walls.add(new Wall(new Location(100, 200), 20, 150));
-        walls.add(new Wall(new Location(680, 200), 20, 150));
+        walls.add(new Wall(new Location(250, 100), 6, 1, 6));
+        walls.add(new Wall(new Location(100, 200), 6, 6, 1));
+        walls.add(new Wall(new Location(680, 200), 6, 6, 1));
     }
 
     private static TankWar INSTANCE;
@@ -78,14 +75,10 @@ class TankWar extends JComponent {
         if(playerTank.isAlive() && this.gameStart){
             playerTankEatBlood();
             playerTankIsDying();
-            missileOutOfBounds();
-            missileHitTank();
-            missileHitWalls();
-            playerTankHitEnemyTank();
-            playerTankHitWalls();
             enemyTankRandomMoveAndFire();
-            enemyTankHitEachOther();
-            enemyTankHitWalls();
+            missileOutOfBounds();
+            missileHitWalls();
+            missileHitTank();
         }
     }
 
@@ -96,15 +89,7 @@ class TankWar extends JComponent {
         }
     }
 
-    private void enemyTankHitWalls(){
-        for(Wall wall : walls){
-            for(EnemyTank enemyTank : enemyTanks){
-                if(wall.getRectangle().intersects(enemyTank.getRectangle())){
-                    enemyTank.setRandomDirection();
-                }
-            }
-        }
-    }
+
 
     private void playerTankIsDying(){
         if(playerTank.getHp() < PlayerTank.FULL_HP / 2){
@@ -160,30 +145,22 @@ class TankWar extends JComponent {
         }
     }
 
-
-
-    private void playerTankHitWalls(){
-        for(Wall wall : walls){
-            if(wall.getRectangle().intersects(playerTank.getRectangle())){
-
-            }
-        }
-    }
-
-    private void enemyTankHitEachOther() throws CloneNotSupportedException {
-        for(int i = 0;i < enemyTanks.size(); ++i)
-            for(int j = i + 1; j < enemyTanks.size(); ++j){
-                if(enemyTanks.get(i).getRectangle().intersects(enemyTanks.get(j).getRectangle())){
-                    enemyTanks.get(i).randomMove();
-                    enemyTanks.get(j).randomMove();
+    public boolean tankHitEachOther(Tank tank){
+        for(int i = 0;i < enemyTanks.size(); ++i) {
+            EnemyTank enemy = enemyTanks.get(i);
+            if (enemy.getId() != tank.getId()) {
+                if (tank.getRectangle().intersects(enemyTanks.get(i).getRectangle())) {
+                    return true;
                 }
             }
+        }
+        return false;
     }
 
     public boolean tankHitBounds(Tank tank){
         int x = tank.getLocation().getX();
         int y = tank.getLocation().getY();
-        if(x <= 0 || x > TankWar.WIDTH  - Tank.WIDTH|| y <= 0 || y > TankWar.HEIGHT - Tank.HEIGHT)
+        if(x <= 0 || x >= TankWar.WIDTH  - tank.getWidth() * 1.5|| y <= 0 || y >= TankWar.HEIGHT - tank.getHeight() * 1.8)
             return true;
         return false;
     }
@@ -196,15 +173,6 @@ class TankWar extends JComponent {
         }
         return false;
     }
-
-    private void playerTankHitEnemyTank() throws CloneNotSupportedException {
-        //enemyTanks.removeIf(enemyTank -> enemyTank.getRectangle().intersects(playerTank.getRectangle()));
-        for(EnemyTank enemyTank : enemyTanks){
-            if(enemyTank.getRectangle().intersects(playerTank.getRectangle()))
-                enemyTank.randomMove();
-        }
-    }
-
 
     @Override
     protected void paintComponent(Graphics g) {

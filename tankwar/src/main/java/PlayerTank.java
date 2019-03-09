@@ -10,7 +10,10 @@ public class PlayerTank extends Tank implements KeyListener {
         super.speedX = 5;
         super.speedY = 5;
         super.direction = Direction.Down;
+        setImage();
     }
+
+
 
     private void updateLocation() throws CloneNotSupportedException {
         //update the location of tank
@@ -19,7 +22,9 @@ public class PlayerTank extends Tank implements KeyListener {
             if(this.canMove())
                 this.move();
         }else{
-            this.direction = newDir;
+            if(super.canChangeDirection(newDir)){
+                super.changeDirection(newDir);
+            }
         }
     }
 

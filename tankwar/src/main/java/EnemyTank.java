@@ -1,7 +1,8 @@
-public class EnemyTank extends Tank{
+public class EnemyTank extends Tank implements Cloneable{
     public final static int FULL_HP = 20;
     final static int MOVE_EPOCH = 3;
     final static int FIRE_EPOCH = 5;
+
 
     private int randStep;
     private int moveEpoch;
@@ -16,13 +17,18 @@ public class EnemyTank extends Tank{
         this.randStep = Tools.nextInt(5);
         this.moveEpoch = MOVE_EPOCH;
         this.fireEpoch = FIRE_EPOCH;
+        setImage();
     }
 
-    public void setRandomDirection(){
+    public void setRandomDirection() throws CloneNotSupportedException {
         int rand = Tools.nextInt(8);
         for(Direction dir : Direction.values()){
-            if(dir.ordinal() == rand)
-                this.direction = dir;
+            if(dir.ordinal() == rand){
+                if(super.canChangeDirection(dir)){
+                    super.changeDirection(dir);
+                    break;
+                }
+            }
         }
     }
 
