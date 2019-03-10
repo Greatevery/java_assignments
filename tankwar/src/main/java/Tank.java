@@ -99,6 +99,7 @@ public class Tank extends GameObject implements Cloneable{
         //draw HP
         if("PlayerTank".equals(this.getClass().getName())){
             g.setColor(Color.RED);
+            g.drawRect(this.location.getX(), this.location.getY() - 10, 35, 10);
             g.fillRect(this.location.getX(), this.location.getY() - 10, 35 * this.hp / PlayerTank.FULL_HP, 10);
         }
 

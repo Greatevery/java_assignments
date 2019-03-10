@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 class TankWar extends JComponent implements MouseListener {
-    public static final int WIDTH = 800, HEIGHT = 600;
+    public static final int WIDTH = 800, HEIGHT = 632;
     public static final int GAME_WIDTH = 600, GAME_HEIGHT = 600;
 
     private static final int REPAINT_INTERVAL = 50;
@@ -207,7 +207,7 @@ class TankWar extends JComponent implements MouseListener {
     public boolean tankHitBounds(Tank tank){
         int x = tank.getLocation().getX();
         int y = tank.getLocation().getY();
-        if(x <= 0 || x >= TankWar.GAME_WIDTH  - tank.getWidth() - 1|| y <= 0 || y >= TankWar.GAME_HEIGHT - tank.getHeight() * 2 + 2)
+        if(x <= 0 || x >= TankWar.GAME_WIDTH  - tank.getWidth()|| y <= 0 || y >= TankWar.GAME_HEIGHT - tank.getHeight())
             return true;
         return false;
     }
@@ -223,16 +223,15 @@ class TankWar extends JComponent implements MouseListener {
 
     @Override
     protected void paintComponent(Graphics g) {
-
-        //draw background
-        g.setColor(Color.LIGHT_GRAY);
-        g.fillRect(0, 0, WIDTH, HEIGHT);
-        g.setColor(Color.BLACK);
-        g.fillRect(0,0,GAME_WIDTH, GAME_HEIGHT);
         //start UI
         if(!this.gameStart){
             g.drawImage(new ImageIcon(this.getClass().getResource("images/background.png")).getImage(), 0, 0, null);
         }else{
+            //draw background
+            g.setColor(Color.LIGHT_GRAY);
+            g.fillRect(0, 0, WIDTH, HEIGHT);
+            g.setColor(Color.BLACK);
+            g.fillRect(0,0,GAME_WIDTH, GAME_HEIGHT);
             //draw game data
             g.setColor(Color.BLACK);
             g.setFont(new Font("Default", Font.BOLD, 14));
@@ -259,7 +258,7 @@ class TankWar extends JComponent implements MouseListener {
                 Tools.playAudio("death.mp3");
                 g.setColor(Color.RED);
                 g.setFont(new Font("Default", Font.BOLD, 30));
-                g.drawString("GAME OVER ", GAME_WIDTH / 2 - 80, GAME_HEIGHT / 2 - 100);
+                g.drawString("GAME OVER ", GAME_WIDTH / 2 - 100, GAME_HEIGHT / 2 - 100);
                 g.drawString("PRESS F2 TO RESTART", GAME_WIDTH / 2 - 160, GAME_HEIGHT / 2 - 60);
             }
         }
@@ -283,8 +282,6 @@ class TankWar extends JComponent implements MouseListener {
     }
 
     public static void main(String[] args) {
-
-
         PlatformImpl.startup(() -> {});
         Tools.setTheme();
         JFrame frame = new JFrame("Tank War");
@@ -292,7 +289,7 @@ class TankWar extends JComponent implements MouseListener {
         frame.setSize(WIDTH, HEIGHT);
         frame.setLocation(400, 100);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setResizable(true);
+        frame.setResizable(false);
 
         TankWar tankWar = TankWar.getInstance();
         tankWar.initWorld();

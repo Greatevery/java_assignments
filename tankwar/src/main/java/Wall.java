@@ -3,8 +3,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Wall extends GameObject {
-    private static final int GAP_TANK = 40;
-    private static final int GAP_BRICK = 26;
+    public static final int GAP_TANK = 40;
+    public static final int GAP_BRICK = 26;
     private List<Brick> bricks;
 
     public Wall() {
@@ -52,13 +52,13 @@ public class Wall extends GameObject {
             bricks.add(new Brick(new Location(GAP_TANK * 6, TankWar.GAME_HEIGHT / 2 + GAP_BRICK * i)));
             bricks.add(new Brick(new Location(GAP_TANK * 8, TankWar.GAME_HEIGHT / 2 + GAP_BRICK * i)));
         }
-        for (int i = 2; i <= 4 ; i++) {
+        for (int i = 1; i <= 3 ; i++) {
             bricks.add(new Brick(new Location(GAP_TANK * 6 + GAP_BRICK / 4, TankWar.GAME_HEIGHT - GAP_BRICK * i)));
             bricks.add(new Brick(new Location(GAP_TANK * 6 + GAP_BRICK / 4 + 3 * GAP_BRICK, TankWar.GAME_HEIGHT - GAP_BRICK * i)));
 
         }
-        bricks.add(new Brick(new Location(GAP_TANK * 6 + GAP_BRICK / 4 + GAP_BRICK, TankWar.GAME_HEIGHT - GAP_BRICK * 4)));
-        bricks.add(new Brick(new Location(GAP_TANK * 6 + GAP_BRICK / 4 + GAP_BRICK * 2, TankWar.GAME_HEIGHT - GAP_BRICK * 4)));
+        bricks.add(new Brick(new Location(GAP_TANK * 6 + GAP_BRICK / 4 + GAP_BRICK, TankWar.GAME_HEIGHT - GAP_BRICK * 3)));
+        bricks.add(new Brick(new Location(GAP_TANK * 6 + GAP_BRICK / 4 + GAP_BRICK * 2, TankWar.GAME_HEIGHT - GAP_BRICK * 3)));
     }
 
     public List<Brick> getBricks() {
