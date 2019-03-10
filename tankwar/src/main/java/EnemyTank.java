@@ -13,7 +13,7 @@ public class EnemyTank extends Tank implements Cloneable{
         this.hp = FULL_HP;
         this.speedX = 5;
         this.speedY = 5;
-        this.direction = Direction.Up;
+        this.direction = Direction.Down;
         this.randStep = Tools.nextInt(5);
         this.moveEpoch = MOVE_EPOCH;
         this.fireEpoch = FIRE_EPOCH;

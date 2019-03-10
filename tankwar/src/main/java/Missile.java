@@ -66,7 +66,7 @@ public class Missile extends GameObject{
     public boolean outOfBounds(){
         int x = this.getLocation().getX();
         int y = this.getLocation().getY();
-        if(x < 0 || x > TankWar.WIDTH || y < 0 || y > TankWar.HEIGHT)
+        if(x < 0 || x > TankWar.GAME_WIDTH || y < 0 || y > TankWar.GAME_HEIGHT)
             return true;
         return false;
     }

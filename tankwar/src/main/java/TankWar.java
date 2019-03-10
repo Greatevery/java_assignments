@@ -9,8 +9,10 @@ import java.util.ListIterator;
 
 class TankWar extends JComponent implements MouseListener {
     public static final int WIDTH = 800, HEIGHT = 600;
+    public static final int GAME_WIDTH = 600, GAME_HEIGHT = 600;
 
     private static final int REPAINT_INTERVAL = 50;
+    private static final int TIME_GAP = 100;
 
     private JButton singlePlayerMode;
     private JButton twoPlayerMode;
@@ -18,8 +20,9 @@ class TankWar extends JComponent implements MouseListener {
     private JButton moreGames;
 
     private boolean gameStart;
-    private int x = WIDTH / 2, y = HEIGHT / 2; //initialized location of playerTank
+    private int x =  GAME_WIDTH / 2 - 100, y = GAME_HEIGHT - 80; //initialized location of playerTank
 
+    private int time_gap;
     private PlayerTank playerTank;
     private List<EnemyTank> enemyTanks;
     private Blood blood;
@@ -29,6 +32,7 @@ class TankWar extends JComponent implements MouseListener {
 
     private TankWar() {
         gameStart = false;
+        time_gap = TIME_GAP;
 
         singlePlayerMode = new JButton();
         twoPlayerMode = new JButton();
@@ -53,14 +57,9 @@ class TankWar extends JComponent implements MouseListener {
         enemyTanks = new ArrayList<>();
         missiles = new ArrayList<>();
         explodes = new ArrayList<>();
-        blood = new Blood(new Location(360, 270));
+        blood = new Blood(new Location(GAME_WIDTH / 2, GAME_HEIGHT / 2));
         map = new Map();
         this.addKeyListener(this.playerTank);
-        //initialize enemy tanks
-        int dist = (WIDTH - 120) / 12;
-        for(int i = 0;i < 12; ++i){
-            enemyTanks.add(new EnemyTank(new Location(50 + dist * i,HEIGHT / 2 + 100)));
-        }
     }
 
     private static TankWar INSTANCE;
@@ -92,12 +91,33 @@ class TankWar extends JComponent implements MouseListener {
 
     private void triggerEvent() throws CloneNotSupportedException {
         if(playerTank.isAlive() && this.gameStart){
+            addEnemyTank();
             playerTankEatBlood();
             playerTankIsDying();
             enemyTankRandomMoveAndFire();
             missileOutOfBounds();
             missileHitWalls();
             missileHitTank();
+        }
+    }
+
+    private void addEnemyTank(){
+        if(time_gap-- <= 0){
+            while (true){
+                int rand = Tools.nextInt(560);
+                EnemyTank enemyTank = new EnemyTank(new Location(rand, 2));
+                int i;
+                for(i = 0;i < enemyTanks.size(); ++i){
+                    if(enemyTank.getRectangle().intersects(enemyTanks.get(i).getRectangle())){
+                        break;
+                    }
+                }
+                if(i == enemyTanks.size()){
+                    enemyTanks.add(enemyTank);
+                    time_gap = TIME_GAP;
+                    break;
+                }
+            }
         }
     }
 
@@ -127,8 +147,8 @@ class TankWar extends JComponent implements MouseListener {
     }
 
     private void missileHitWalls(){
-        for(Wall wall : map.getWalls()){
-            missiles.removeIf(missile -> missile.getRectangle().intersects(wall.getRectangle()));
+        for (Brick brick : map.getWall().getBricks()) {
+              missiles.removeIf(missile -> missile.getRectangle().intersects(brick.getRectangle()));
         }
     }
 
@@ -179,14 +199,14 @@ class TankWar extends JComponent implements MouseListener {
     public boolean tankHitBounds(Tank tank){
         int x = tank.getLocation().getX();
         int y = tank.getLocation().getY();
-        if(x <= 0 || x >= TankWar.WIDTH  - tank.getWidth() * 1.5|| y <= 0 || y >= TankWar.HEIGHT - tank.getHeight() * 1.8)
+        if(x <= 0 || x >= TankWar.GAME_WIDTH  - tank.getWidth()|| y <= 0 || y >= TankWar.GAME_HEIGHT - tank.getHeight() * 1.8)
             return true;
         return false;
     }
 
     public boolean tankHitWalls(Tank tank){
-        for(Wall wall : map.getWalls()){
-            if(wall.getRectangle().intersects(tank.getRectangle())){
+        for(Brick brick : map.getWall().getBricks()){
+            if(brick.getRectangle().intersects(tank.getRectangle())){
                 return true;
             }
         }
@@ -197,8 +217,10 @@ class TankWar extends JComponent implements MouseListener {
     protected void paintComponent(Graphics g) {
 
         //draw background
-        g.setColor(Color.BLACK);
+        g.setColor(Color.DARK_GRAY);
         g.fillRect(0, 0, WIDTH, HEIGHT);
+        g.setColor(Color.BLACK);
+        g.fillRect(0,0,GAME_WIDTH, GAME_HEIGHT);
         //start UI
         if(!this.gameStart){
             g.drawImage(new ImageIcon(this.getClass().getResource("images/background.png")).getImage(), 0, 0, null);
@@ -206,11 +228,11 @@ class TankWar extends JComponent implements MouseListener {
             //draw game data
             g.setColor(Color.WHITE);
             g.setFont(new Font("Default", Font.BOLD, 14));
-            g.drawString("Missiles: " + missiles.size(), 10, 50);
-            g.drawString("Explodes: " + explodes.size(), 10, 70);
-            g.drawString("Our Tank HP: " + playerTank.getHp(), 10, 90);
-            g.drawString("Enemies Left: " + enemyTanks.size(), 10, 110);
-            g.drawString("Enemies Killed: " + (12 - enemyTanks.size()), 10, 130);
+            g.drawString("Missiles: " + missiles.size(), GAME_WIDTH + 10, 50);
+            g.drawString("Explodes: " + explodes.size(), GAME_WIDTH + 10, 70);
+            g.drawString("Our Tank HP: " + playerTank.getHp(), GAME_WIDTH + 10, 90);
+            g.drawString("Enemies Left: " + enemyTanks.size(), GAME_WIDTH + 10, 110);
+            g.drawString("Enemies Killed: " + (12 - enemyTanks.size()), GAME_WIDTH + 10, 130);
             map.draw(g);
             blood.draw(g);
 
@@ -229,8 +251,8 @@ class TankWar extends JComponent implements MouseListener {
                 Tools.playAudio("death.mp3");
                 g.setColor(Color.RED);
                 g.setFont(new Font("Default", Font.BOLD, 30));
-                g.drawString("GAME OVER ", x - 100, y - 100);
-                g.drawString("PRESS F2 TO RESTART", x - 160, y - 60);
+                g.drawString("GAME OVER ", GAME_WIDTH / 2, GAME_HEIGHT / 2 - 100);
+                g.drawString("PRESS F2 TO RESTART", GAME_WIDTH / 2 - 160, GAME_HEIGHT / 2 - 60);
             }
         }
     }
