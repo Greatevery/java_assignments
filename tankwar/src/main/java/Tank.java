@@ -6,8 +6,7 @@ public class Tank extends GameObject implements Cloneable{
 
     protected int id;
     protected int hp;
-    protected int speedX;
-    protected int speedY;
+    protected int speed;
     protected Direction direction;
 
     public Tank(Location location){
@@ -73,8 +72,8 @@ public class Tank extends GameObject implements Cloneable{
     }
 
     protected void move(){
-        this.location.setX(this.location.getX() + this.speedX * direction.xDir);
-        this.location.setY((this.location.getY() + this.speedY * direction.yDir));
+        this.location.setX(this.location.getX() + this.speed * direction.xDir);
+        this.location.setY((this.location.getY() + this.speed * direction.yDir));
     }
 
     protected boolean canChangeDirection(Direction dir) throws CloneNotSupportedException {

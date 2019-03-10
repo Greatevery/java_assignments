@@ -1,23 +1,18 @@
-import javax.swing.*;
 import java.awt.*;
 
 public class Missile extends GameObject{
-    public static final int WIDTH = 10, HEIGHT = 10;
-
     private Direction direction;
     private Tank tank;
-    private int speedX;
-    private int speedY;
-    private boolean exist;
+    private int speed;
 
     public Missile(Tank tank, Direction direction){
         this.tank = tank;
         this.direction = direction;
         super.location = initLocation();
         super.image = this.direction.getImage("Missile");
-        this.speedX = 10;
-        this.speedY = 10;
-        this.exist = true;
+        super.width = image.getWidth(null);
+        super.height = image.getHeight(null);
+        this.speed = 10;
     }
 
     public String getTankType(){
@@ -59,33 +54,19 @@ public class Missile extends GameObject{
         return new Location(x, y);
     }
 
-    public boolean isExist(){
-        return exist;
-    }
-
     public boolean outOfBounds(){
         int x = this.getLocation().getX();
         int y = this.getLocation().getY();
-        if(x < 0 || x > TankWar.GAME_WIDTH || y < 0 || y > TankWar.GAME_HEIGHT)
+        if(x < 0 || x >= TankWar.GAME_WIDTH - width|| y < 0 || y >= TankWar.GAME_HEIGHT - height)
             return true;
         return false;
     }
 
-    public boolean hitEnemyTank(){
-        return false;
-    }
-
-
     public void move(){
-        int x = this.location.getX() + speedX * this.direction.xDir;
-        int y = this.location.getY() + speedY * this.direction.yDir;
+        int x = this.location.getX() + speed * this.direction.xDir;
+        int y = this.location.getY() + speed * this.direction.yDir;
         this.location.setX(x);
         this.location.setY(y);
-    }
-
-    @Override
-    public Rectangle getRectangle() {
-        return new Rectangle(this.location.getX(), this.location.getY(), WIDTH, HEIGHT);
     }
 
     @Override

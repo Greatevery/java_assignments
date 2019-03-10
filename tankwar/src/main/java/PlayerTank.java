@@ -7,8 +7,7 @@ public class PlayerTank extends Tank implements KeyListener {
     public PlayerTank(Location location){
         super(location);
         super.hp = FULL_HP;
-        super.speedX = 5;
-        super.speedY = 5;
+        super.speed = 5;
         super.direction = Direction.Up;
         setImage();
     }
