@@ -6,13 +6,15 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 class TankWar extends JComponent implements MouseListener {
-    public static final int WIDTH = 800, HEIGHT = 632;
+    public static final int WIDTH = 800, HEIGHT = 638;
     public static final int GAME_WIDTH = 600, GAME_HEIGHT = 600;
 
     private static final int REPAINT_INTERVAL = 50;
     private static final int TIME_GAP = 100;
+    private static final int MAX_HIT_COUNTS = 1;
 
     private JButton singlePlayerMode;
     private JButton twoPlayerMode;
@@ -20,7 +22,7 @@ class TankWar extends JComponent implements MouseListener {
     private JButton moreGames;
 
     private boolean gameStart;
-    private int x =  GAME_WIDTH / 2 - 100, y = GAME_HEIGHT - 80; //initialized location of playerTank
+    private int x =  GAME_WIDTH / 2 - 100, y = GAME_HEIGHT - 40; //initialized location of playerTank
 
     private int time_gap;
     private PlayerTank playerTank;
@@ -42,6 +44,15 @@ class TankWar extends JComponent implements MouseListener {
         setMenuButton(twoPlayerMode, 300, 315, 220, 70);
         setMenuButton(moreGames, 300, 395, 220, 70);
         setMenuButton(help, 300, 475, 220, 70);
+
+        playerTank = new PlayerTank(new Location(x,y));
+        enemyTanks = new ArrayList<>();
+        missiles = new CopyOnWriteArrayList<>();
+        explodes = new ArrayList<>();
+        blood = new Blood(new Location(GAME_WIDTH / 2, GAME_HEIGHT / 2));
+        map = new Map();
+        this.addKeyListener(this.playerTank);
+
     }
 
     private void setMenuButton(JButton button, int x, int y, int width, int height){
@@ -50,17 +61,9 @@ class TankWar extends JComponent implements MouseListener {
         button.addMouseListener(this);
         this.add(button);
 
+
     }
 
-    private void initWorld(){
-        playerTank = new PlayerTank(new Location(x,y));
-        enemyTanks = new ArrayList<>();
-        missiles = new ArrayList<>();
-        explodes = new ArrayList<>();
-        blood = new Blood(new Location(GAME_WIDTH / 2, GAME_HEIGHT / 2));
-        map = new Map();
-        this.addKeyListener(this.playerTank);
-    }
 
     private static TankWar INSTANCE;
 
@@ -72,8 +75,13 @@ class TankWar extends JComponent implements MouseListener {
     }
 
     public void restart(){
-        this.initWorld();
         //this.gameStart = false;
+        playerTank.setLocation(new Location(x, y));
+        enemyTanks.clear();
+        missiles.clear();
+        explodes.clear();
+        blood.setLocation(new Location(GAME_WIDTH / 2, GAME_HEIGHT / 2));
+        map = new Map();
     }
 
     public boolean isGameStart() {
@@ -98,13 +106,14 @@ class TankWar extends JComponent implements MouseListener {
             missileOutOfBounds();
             missileHitWalls();
             missileHitTank();
+            missileHitHome();
         }
     }
 
     private void addEnemyTank(){
         if(time_gap-- <= 0){
             while (true){
-                int rand = Tools.nextInt(560);
+                int rand = Tools.nextInt(520);
                 EnemyTank enemyTank = new EnemyTank(new Location(rand, 2));
                 int i;
                 for(i = 0;i < enemyTanks.size(); ++i){
@@ -150,8 +159,29 @@ class TankWar extends JComponent implements MouseListener {
     }
 
     private void missileHitWalls(){
-        for (Brick brick : map.getWall().getBricks()) {
-              missiles.removeIf(missile -> missile.getRectangle().intersects(brick.getRectangle()));
+        for (int i = 0; i < map.getWall().getBricks().size(); ++i) {
+            Brick brick = map.getWall().getBricks().get(i);
+            for(int j = 0;j < missiles.size(); ++j){
+                if(brick.getRectangle().intersects(missiles.get(j).getRectangle())){
+                    if(brick.getHitCounts() >= MAX_HIT_COUNTS){
+                        map.getWall().getBricks().remove(brick);
+                    }else{
+                        brick.hit();
+                    }
+                    missiles.remove(j);
+                    break;
+                }
+            }
+
+        }
+    }
+
+    private void missileHitHome(){
+        for(int i = 0;i < missiles.size(); ++i){
+            if(missiles.get(i).getRectangle().intersects(map.getHome().getRectangle())){
+                explodes.add(new Explode(map.getHome().getLocation()));
+                map.getHome().setAlive(false);
+            }
         }
     }
 
@@ -207,7 +237,7 @@ class TankWar extends JComponent implements MouseListener {
     public boolean tankHitBounds(Tank tank){
         int x = tank.getLocation().getX();
         int y = tank.getLocation().getY();
-        if(x <= 0 || x >= TankWar.GAME_WIDTH  - tank.getWidth()|| y <= 0 || y >= TankWar.GAME_HEIGHT - tank.getHeight())
+        if(x < 0 || x > TankWar.GAME_WIDTH  - tank.getWidth()|| y < 0 || y > TankWar.GAME_HEIGHT - tank.getHeight())
             return true;
         return false;
     }
@@ -217,6 +247,13 @@ class TankWar extends JComponent implements MouseListener {
             if(brick.getRectangle().intersects(tank.getRectangle())){
                 return true;
             }
+        }
+        return false;
+    }
+
+    public boolean isGameOver(){
+        if(!playerTank.isAlive() || !map.getHome().isAlive()){
+            return true;
         }
         return false;
     }
@@ -240,11 +277,12 @@ class TankWar extends JComponent implements MouseListener {
             g.drawString("Our Tank HP: " + playerTank.getHp(), GAME_WIDTH + 10, 90);
             g.drawString("Enemies Left: " + enemyTanks.size(), GAME_WIDTH + 10, 110);
             g.drawString("Enemies Killed: " + explodes.size(), GAME_WIDTH + 10, 130);
-            map.draw(g);
-            blood.draw(g);
+
 
             //if player tank is alive, then draw the player tank and enemy tanks
-            if(playerTank.isAlive()){
+            if(!isGameOver()){
+                map.draw(g);
+                blood.draw(g);
                 playerTank.draw(g);
                 for(int i = 0; i < missiles.size(); ++i)
                     missiles.get(i).draw(g);
@@ -292,7 +330,6 @@ class TankWar extends JComponent implements MouseListener {
         frame.setResizable(false);
 
         TankWar tankWar = TankWar.getInstance();
-        tankWar.initWorld();
         frame.add(tankWar);
         // KeyListeners need to be on the focused component to work
         tankWar.setFocusable(true);

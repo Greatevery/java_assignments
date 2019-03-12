@@ -16,6 +16,10 @@ public class Map extends GameObject{
         return wall;
     }
 
+    public Home getHome() {
+        return home;
+    }
+
     @Override
     public void draw(Graphics g) {
         //g.drawImage(tree, TankWar.WIDTH - tree.getWidth(null) * 2, 0, null);

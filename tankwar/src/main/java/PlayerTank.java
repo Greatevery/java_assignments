@@ -12,8 +12,6 @@ public class PlayerTank extends Tank implements KeyListener {
         setImage();
     }
 
-
-
     private void updateLocation() throws CloneNotSupportedException {
         //update the location of tank
         Direction newDir = updateDirection();
@@ -68,7 +66,7 @@ public class PlayerTank extends Tank implements KeyListener {
                 }
                 return;
             case KeyEvent.VK_F2:
-                if(!this.isAlive()){
+                if(TankWar.getInstance().isGameOver()){
                     TankWar.getInstance().restart();
                 }
                 return;

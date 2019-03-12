@@ -1,4 +1,4 @@
-public class EnemyTank extends Tank implements Cloneable{
+public class EnemyTank extends Tank{
     public final static int FULL_HP = 20;
     final static int MOVE_EPOCH = 3;
     final static int FIRE_EPOCH = 5;

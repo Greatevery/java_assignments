@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Wall extends GameObject {
     public static final int GAP_TANK = 40;
@@ -9,7 +10,7 @@ public class Wall extends GameObject {
 
     public Wall() {
         super();
-        bricks = new ArrayList<>();
+        bricks = new CopyOnWriteArrayList<>();
         //initialize bricks
         bricks.add(new Brick(new Location(GAP_TANK, GAP_BRICK + 15)));
         bricks.add(new Brick(new Location(GAP_TANK * 4, GAP_BRICK + 15)));
