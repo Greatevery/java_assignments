@@ -12,6 +12,8 @@ public class PlayerTank extends Tank implements KeyListener {
         setImage();
     }
 
+
+
     private void updateLocation() throws CloneNotSupportedException {
         //update the location of tank
         Direction newDir = updateDirection();

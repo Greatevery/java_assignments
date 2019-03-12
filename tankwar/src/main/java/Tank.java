@@ -47,6 +47,7 @@ public class Tank extends GameObject implements Cloneable{
         }
     }
 
+
     public int getId() {
         return id;
     }

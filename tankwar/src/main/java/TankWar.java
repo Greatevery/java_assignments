@@ -22,6 +22,7 @@ class TankWar extends JComponent implements MouseListener {
     private JButton moreGames;
 
     private boolean gameStart;
+    private boolean gameOver;
     private int x =  GAME_WIDTH / 2 - 100, y = GAME_HEIGHT - 40; //initialized location of playerTank
 
     private int time_gap;
@@ -34,6 +35,7 @@ class TankWar extends JComponent implements MouseListener {
 
     private TankWar() {
         gameStart = false;
+        gameOver = false;
         time_gap = TIME_GAP;
 
         singlePlayerMode = new JButton();
@@ -45,13 +47,14 @@ class TankWar extends JComponent implements MouseListener {
         setMenuButton(moreGames, 300, 395, 220, 70);
         setMenuButton(help, 300, 475, 220, 70);
 
-        playerTank = new PlayerTank(new Location(x,y));
+        playerTank = new PlayerTank(new Location(x, y));
+        this.addKeyListener(this.playerTank);
+
         enemyTanks = new ArrayList<>();
         missiles = new CopyOnWriteArrayList<>();
         explodes = new ArrayList<>();
         blood = new Blood(new Location(GAME_WIDTH / 2, GAME_HEIGHT / 2));
         map = new Map();
-        this.addKeyListener(this.playerTank);
 
     }
 
@@ -75,13 +78,13 @@ class TankWar extends JComponent implements MouseListener {
     }
 
     public void restart(){
-        //this.gameStart = false;
         playerTank.setLocation(new Location(x, y));
-        enemyTanks.clear();
-        missiles.clear();
-        explodes.clear();
+        playerTank.changeDirection(Direction.Up);
+        playerTank.setHp(PlayerTank.FULL_HP);
         blood.setLocation(new Location(GAME_WIDTH / 2, GAME_HEIGHT / 2));
-        map = new Map();
+        blood.setAppear(true);
+        map.init();
+        gameOver = false;
     }
 
     public boolean isGameStart() {
@@ -98,7 +101,7 @@ class TankWar extends JComponent implements MouseListener {
     }
 
     private void triggerEvent() throws CloneNotSupportedException {
-        if(playerTank.isAlive() && this.gameStart){
+        if(playerTank.isAlive() && this.gameStart && !isGameOver()){
             addEnemyTank();
             playerTankEatBlood();
             playerTankIsDying();
@@ -107,6 +110,7 @@ class TankWar extends JComponent implements MouseListener {
             missileHitWalls();
             missileHitTank();
             missileHitHome();
+            gameOver();
         }
     }
 
@@ -217,6 +221,15 @@ class TankWar extends JComponent implements MouseListener {
         }
     }
 
+    private void gameOver(){
+        if(!playerTank.isAlive() || !map.getHome().isAlive()){
+            gameOver = true;
+            enemyTanks.clear();
+            missiles.clear();
+            explodes.clear();
+        }
+    }
+
     public boolean tankHitEachOther(Tank tank){
         if(tank.getId() != playerTank.getId()){
             if(tank.getRectangle().intersects(playerTank.getRectangle())){
@@ -251,11 +264,9 @@ class TankWar extends JComponent implements MouseListener {
         return false;
     }
 
+
     public boolean isGameOver(){
-        if(!playerTank.isAlive() || !map.getHome().isAlive()){
-            return true;
-        }
-        return false;
+        return gameOver;
     }
 
     @Override
@@ -277,21 +288,16 @@ class TankWar extends JComponent implements MouseListener {
             g.drawString("Our Tank HP: " + playerTank.getHp(), GAME_WIDTH + 10, 90);
             g.drawString("Enemies Left: " + enemyTanks.size(), GAME_WIDTH + 10, 110);
             g.drawString("Enemies Killed: " + explodes.size(), GAME_WIDTH + 10, 130);
-
-
-            //if player tank is alive, then draw the player tank and enemy tanks
-            if(!isGameOver()){
-                map.draw(g);
-                blood.draw(g);
-                playerTank.draw(g);
-                for(int i = 0; i < missiles.size(); ++i)
-                    missiles.get(i).draw(g);
-                for(int i = 0;i < enemyTanks.size(); ++i)
-                    enemyTanks.get(i).draw(g);
-                for(int i = 0;i < explodes.size(); ++i)
-                    explodes.get(i).draw(g);
-
-            }else{
+            map.draw(g);
+            blood.draw(g);
+            playerTank.draw(g);
+            for(int i = 0; i < missiles.size(); ++i)
+                missiles.get(i).draw(g);
+            for(int i = 0;i < enemyTanks.size(); ++i)
+                enemyTanks.get(i).draw(g);
+            for(int i = 0;i < explodes.size(); ++i)
+                explodes.get(i).draw(g);
+            if(isGameOver()){
                 //draw the UI of game over
                 Tools.playAudio("death.mp3");
                 g.setColor(Color.RED);
