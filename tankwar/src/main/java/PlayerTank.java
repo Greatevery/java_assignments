@@ -1,8 +1,10 @@
 
 import java.awt.event.*;
+import java.util.List;
 
 public class PlayerTank extends Tank implements KeyListener {
     public static final int FULL_HP = 1000;
+    private boolean invincible;
 
     public PlayerTank(Location location){
         super(location);
@@ -10,9 +12,20 @@ public class PlayerTank extends Tank implements KeyListener {
         super.speed = 5;
         super.direction = Direction.Up;
         setImage();
+        invincible = false;
+    }
+
+    private void changeStatus(){
+        if(invincible == true)
+            invincible = false;
+        else
+            invincible = true;
     }
 
 
+    public boolean isInvincible() {
+        return invincible;
+    }
 
     private void updateLocation() throws CloneNotSupportedException {
         //update the location of tank
@@ -77,6 +90,17 @@ public class PlayerTank extends Tank implements KeyListener {
                 return;
             case KeyEvent.VK_A :
                 this.superFire();
+                return;
+            case KeyEvent.VK_H:
+                List<Brick> bricks = TankWar.getInstance().getMap().getWall().getBricks();
+                for(int i = 0;i < bricks.size();++i){
+                    if(bricks.get(i).getType() == 1){
+                        bricks.get(i).changeInvisible();
+                    }
+                }
+                return;
+            case KeyEvent.VK_I:
+                this.changeStatus();
                 return;
             case KeyEvent.VK_LEFT :
                 bl = true;

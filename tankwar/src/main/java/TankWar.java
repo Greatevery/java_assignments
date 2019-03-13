@@ -50,9 +50,9 @@ class TankWar extends JComponent implements MouseListener {
         playerTank = new PlayerTank(new Location(x, y));
         this.addKeyListener(this.playerTank);
 
-        enemyTanks = new ArrayList<>();
+        enemyTanks = new CopyOnWriteArrayList<>();
         missiles = new CopyOnWriteArrayList<>();
-        explodes = new ArrayList<>();
+        explodes = new CopyOnWriteArrayList<>();
         blood = new Blood(new Location(GAME_WIDTH / 2, GAME_HEIGHT / 2));
         map = new Map();
 
@@ -85,6 +85,10 @@ class TankWar extends JComponent implements MouseListener {
         blood.setAppear(true);
         map.init();
         gameOver = false;
+    }
+
+    public Map getMap() {
+        return map;
     }
 
     public boolean isGameStart() {
@@ -168,7 +172,8 @@ class TankWar extends JComponent implements MouseListener {
             for(int j = 0;j < missiles.size(); ++j){
                 if(brick.getRectangle().intersects(missiles.get(j).getRectangle())){
                     if(brick.getHitCounts() >= MAX_HIT_COUNTS){
-                        map.getWall().getBricks().remove(brick);
+                        if(!brick.isInvisible())
+                             map.getWall().getBricks().remove(brick);
                     }else{
                         brick.hit();
                     }
@@ -183,7 +188,7 @@ class TankWar extends JComponent implements MouseListener {
     private void missileHitHome(){
         for(int i = 0;i < missiles.size(); ++i){
             if(missiles.get(i).getRectangle().intersects(map.getHome().getRectangle())){
-                explodes.add(new Explode(map.getHome().getLocation()));
+                //explodes.add(new Explode(map.getHome().getLocation()));
                 map.getHome().setAlive(false);
             }
         }
@@ -198,24 +203,25 @@ class TankWar extends JComponent implements MouseListener {
 
     private void missileHitTank(){
         ListIterator<Missile> iterMissile = missiles.listIterator();
-        while(iterMissile.hasNext()){
-            Missile missile = iterMissile.next();
+        for(int i = 0;i < missiles.size(); ++i){
+            Missile missile = missiles.get(i);
             //shoot enemy tank
-            if(missile.getTankType() == "PlayerTank"){
-                ListIterator<EnemyTank> iterEnemyTank = enemyTanks.listIterator();
-                while(iterEnemyTank.hasNext()){
-                    EnemyTank enemyTank = iterEnemyTank.next();
+            if(missile.getTankType().equals("PlayerTank")){
+                for(int j = 0; j < enemyTanks.size(); ++j){
+                    EnemyTank enemyTank = enemyTanks.get(j);
                     if(enemyTank.getRectangle().intersects(missile.getRectangle())){
                         explodes.add(new Explode(enemyTank.getLocation()));
-                        iterEnemyTank.remove();
-                        iterMissile.remove();
+                        enemyTanks.remove(j);
+                        missiles.remove(i);
                         break;
                     }
                 }
                 //enemyTanks.removeIf(enemyTank -> enemyTank.getRectangle().intersects(missile.getRectangle()));
             }else{
                 if(playerTank.getRectangle().intersects(missile.getRectangle())){
-                    playerTank.setHp(this.playerTank.getHp() - 20);
+                    if(!playerTank.isInvincible())
+                        playerTank.setHp(this.playerTank.getHp() - 20);
+                    missiles.remove(i);
                 }
             }
         }

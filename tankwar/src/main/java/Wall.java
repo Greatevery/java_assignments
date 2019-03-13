@@ -53,13 +53,15 @@ public class Wall extends GameObject {
             bricks.add(new Brick(new Location(GAP_TANK * 6, TankWar.GAME_HEIGHT / 2 + GAP_BRICK * i)));
             bricks.add(new Brick(new Location(GAP_TANK * 8, TankWar.GAME_HEIGHT / 2 + GAP_BRICK * i)));
         }
+
         for (int i = 1; i <= 3 ; i++) {
-            bricks.add(new Brick(new Location(GAP_TANK * 6 + GAP_BRICK / 4, TankWar.GAME_HEIGHT - GAP_BRICK * i)));
-            bricks.add(new Brick(new Location(GAP_TANK * 6 + GAP_BRICK / 4 + 3 * GAP_BRICK, TankWar.GAME_HEIGHT - GAP_BRICK * i)));
+            bricks.add(new Brick(new Location(Wall.GAP_TANK * 6 + Wall.GAP_BRICK / 4, TankWar.GAME_HEIGHT - Wall.GAP_BRICK * i), 1));
+            bricks.add(new Brick(new Location(Wall.GAP_TANK * 6 + Wall.GAP_BRICK / 4 + 3 * Wall.GAP_BRICK, TankWar.GAME_HEIGHT - Wall.GAP_BRICK * i), 1));
 
         }
-        bricks.add(new Brick(new Location(GAP_TANK * 6 + GAP_BRICK / 4 + GAP_BRICK, TankWar.GAME_HEIGHT - GAP_BRICK * 3)));
-        bricks.add(new Brick(new Location(GAP_TANK * 6 + GAP_BRICK / 4 + GAP_BRICK * 2, TankWar.GAME_HEIGHT - GAP_BRICK * 3)));
+        bricks.add(new Brick(new Location(Wall.GAP_TANK * 6 + Wall.GAP_BRICK / 4 + Wall.GAP_BRICK, TankWar.GAME_HEIGHT - Wall.GAP_BRICK * 3), 1));
+        bricks.add(new Brick(new Location(Wall.GAP_TANK * 6 + Wall.GAP_BRICK / 4 + Wall.GAP_BRICK * 2, TankWar.GAME_HEIGHT - Wall.GAP_BRICK * 3), 1));
+
     }
 
     public List<Brick> getBricks() {
